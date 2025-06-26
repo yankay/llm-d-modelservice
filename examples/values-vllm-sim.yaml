@@ -18,7 +18,7 @@ routing:
     name: llm-d-inference-gateway
 
 modelArtifacts:
-  uri: "hf://random"
+  uri: "hf://random/modelid"
   size: 5Mi
 
 # describe decode pods
@@ -67,12 +67,3 @@ endpointPicker:
   autoscaling:
     enabled: false
   replicas: 1
-
-
-curl http://localhost:8000/v1/completions -vvv \
-    -H "Content-Type: application/json" \
-    -H "x-model-name: facebook/opt-125m" \
-    -d '{
-    "model": "facebook/opt-125m",
-    "prompt": "Hello, "
-}' 

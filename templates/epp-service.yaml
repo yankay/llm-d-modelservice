@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "llm-d-modelservice.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.endpointPicker.service.type }}
   ports:
     - port: {{ .Values.endpointPicker.service.port }}
       targetPort: {{ .Values.endpointPicker.service.targetPort }}

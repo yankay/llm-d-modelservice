@@ -226,13 +226,14 @@ context is a pdSpec
   {{- end }}
   {{- with .pdSpec.acceleratorTypes }}
   {{- include "llm-d-modelservice.acceleratorTypes" . | nindent 2 }}
-  {{- end }}
-  {{- if or .pdSpec.volumes .pdSpec.mountModelVolume }}
+  {{- end -}}
+  {{- /* define volume for the pd pod. Create a volume depending on the model artifact uri type */}}
   volumes:
+  {{- if or .pdSpec.volumes }}
     {{- toYaml .pdSpec.volumes | nindent 4 }}
-    {{ include "llm-d-modelservice.mountModelVolumeVolumes" .Values.modelArtifacts | nindent 4}}
-  {{- end }}
-{{- end }} {{- /* define "llm-d-modelservice.modelPod" */}}
+  {{- end -}}
+  {{ include "llm-d-modelservice.mountModelVolumeVolumes" .Values.modelArtifacts | nindent 4}}
+{{- end }} 
 
 {{/*
 Container elements of deployment/lws spec template
