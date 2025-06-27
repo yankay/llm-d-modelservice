@@ -31,7 +31,7 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Common labels
+Create common labels for the resources managed by this chart.
 */}}
 {{- define "llm-d-modelservice.labels" -}}
 helm.sh/chart: {{ include "llm-d-modelservice.chart" . }}
@@ -41,7 +41,7 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-{{/* Sanitized model name (DNS compliant) */}}
+{{/* Create sanitized model name (DNS compliant) */}}
 {{- define "llm-d-modelservice.sanitizedModelName" -}}
   {{- $name := .Release.Name | lower | trim -}}
   {{- $name = regexReplaceAll "[^a-z0-9_.-]" $name "-" -}}
@@ -56,25 +56,25 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- $name -}}
 {{- end }}
 
-{{/* Common P/D labels */}}
+{{/* Create common shared by prefill and decode deployment/LWS */}}
 {{- define "llm-d-modelservice.pdlabels" -}}
 llm-d.ai/inferenceServing: "true"
 llm-d.ai/model: {{ (include "llm-d-modelservice.fullname" .) -}}
 {{- end }}
 
-{{/* prefill labels */}}
+{{/* Create labels for the prefill deployment/LWS */}}
 {{- define "llm-d-modelservice.prefilllabels" -}}
 {{ include "llm-d-modelservice.pdlabels" . }}
 llm-d.ai/role: prefill
 {{- end }}
 
-{{/* decode labels */}}
+{{/* Create labels for the decode deployment/LWS */}}
 {{- define "llm-d-modelservice.decodelabels" -}}
 {{ include "llm-d-modelservice.pdlabels" . }}
 llm-d.ai/role: decode
 {{- end }}
 
-{{/* affinity from acceleratorTypes */}}
+{{/* Create node affinity from acceleratorTypes in Values */}}
 {{- define "llm-d-modelservice.acceleratorTypes" -}}
 affinity:
   nodeAffinity:
@@ -89,7 +89,7 @@ affinity:
             {{- end }}
 {{- end }}
 
-{{/* Routing proxy -- sidecar for decode pods */}}
+{{/* Create the init container for the routing proxy/sidecar for decode pods */}}
 {{- define "llm-d-modelservice.routingProxy" -}}
 initContainers:
   - name: routing-proxy
@@ -109,7 +109,7 @@ initContainers:
       runAsNonRoot: true
 {{- end }}
 
-{{/* Desired P/d tensor parallelism -- user set or defaults to 1 */}}
+{{/* Desired P/D tensor parallelism -- user set or defaults to 1 */}}
 {{- define "llm-d-modelservice.tensorParallelism" -}}
 {{- if and . .tensor }}{{ .tensor }}{{ else }}1{{ end }}
 {{- end }}

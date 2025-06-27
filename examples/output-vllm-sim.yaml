@@ -133,7 +133,7 @@ metadata:
   name: llmd-sim-llm-d-modelservice-epp
   labels: 
     llm-d.ai/epp: llmd-sim-llm-d-modelservice-epp
-  namespace: default
+  namespace: e2e-solution
 spec:
   replicas: 1
   selector:
@@ -152,7 +152,7 @@ spec:
         - --poolName
         - llmd-sim-llm-d-modelservice-inference-pool
         - --poolNamespace
-        - default
+        - e2e-solution
         - -v
         - "6"
         - --zap-encoder
@@ -278,7 +278,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: llmd-sim-llm-d-modelservice-http-route
-  namespace: default
+  namespace: e2e-solution
   labels:
     helm.sh/chart: llm-d-modelservice-0.0.1
     app.kubernetes.io/version: "0.0.1"
@@ -309,7 +309,7 @@ apiVersion: inference.networking.x-k8s.io/v1alpha2
 kind: InferenceModel
 metadata:
   name: llmd-sim-llm-d-modelservice-inference-model
-  namespace: default
+  namespace: e2e-solution
   labels:
     llm-d.ai/inferenceServing: "true"
     llm-d.ai/model: llmd-sim-llm-d-modelservice
@@ -325,7 +325,7 @@ apiVersion: inference.networking.x-k8s.io/v1alpha2
 kind: InferencePool
 metadata:
   name: llmd-sim-llm-d-modelservice-inference-pool
-  namespace: default
+  namespace: e2e-solution
 spec:
   extensionRef:
     failureMode: FailClose

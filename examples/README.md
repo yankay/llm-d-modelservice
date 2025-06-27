@@ -8,7 +8,7 @@ helm template [RELEASE-NAME] . -f [VALUES-FILEPATH]
 
 1. `vllm-sim` in Kind 
 
-    Make sure there is a gateway (Kgteway or Istio) deployed in the cluster named `llm-d-inference-gateway` or change values file accordingly. Follow [these instructions](https://gateway-api-inference-extension.sigs.k8s.io/guides/#__tabbed_3_2) on how to set up a gateway.
+    Make sure there is a gateway (Kgteway or Istio) deployed in the cluster named `llm-d-inference-gateway` or change values file accordingly. Follow [these instructions](https://gateway-api-inference-extension.sigs.k8s.io/guides/#__tabbed_3_2) on how to set up a gateway. Once done, update `routing.parentRefs[*].name` in the values file to use the name for the Gateway in the cluster.
     
     Dry run:
     
@@ -22,7 +22,7 @@ helm template [RELEASE-NAME] . -f [VALUES-FILEPATH]
     helm install llmd-sim . -f examples/values-vllm-sim.yaml
     ```
     
-    Port forward the inference gateway 
+    Port forward the inference gateway service. 
 
     ```
     k port-forward svc/llm-d-inference-gateway-istio 8000:80
@@ -40,14 +40,14 @@ helm template [RELEASE-NAME] . -f [VALUES-FILEPATH]
     }'
     ```
     
-    You should see a response like the following: 
+    Expect to see a response like the following.
     
     ```
     {"id":"chatcmpl-05cfe79c-234d-4898-b781-3fa59ba7be49","created":1750969231,"model":"random","choices":[{"index":0,"finish_reason":"stop","text":"Alas, poor Yorick! I knew him, Horatio: A fellow of infinite jest"}]}
     ```
 
 
-2. `facebook/opt-125m`: downloads from Hugging Face 
+2. `facebook/opt-125m`: downloads a model from Hugging Face 
 
     Dry-run:
     
@@ -59,17 +59,17 @@ helm template [RELEASE-NAME] . -f [VALUES-FILEPATH]
     
     
     ```
-    helm template facebook . -f examples/values-facebook.yaml
+    helm install facebook . -f examples/values-facebook.yaml
     ```
     
     
-    Port forward the inference gateway 
+    Port forward the inference gateway service.
 
     ```
     k port-forward svc/llm-d-inference-gateway-istio 8000:80
     ```
         
-    Send a request:
+    Send a request,
 
     ```
     curl http://localhost:8000/v1/completions -vvv \
@@ -79,4 +79,10 @@ helm template [RELEASE-NAME] . -f [VALUES-FILEPATH]
         "model": "facebook/opt-125m",
         "prompt": "Hello, "
     }'
+    ```
+    
+    and expect the following response
+    
+    ```
+    {"choices":[{"finish_reason":"length","index":0,"logprobs":null,"prompt_logprobs":null,"stop_reason":null,"text":" That is my dad. He was a wautdig with a shooting blade on"}],"created":1751031325,"id":"cmpl-aca48bc2-fe95-4c3b-843d-1dbcf94c40c7","kv_transfer_params":null,"model":"facebook/opt-125m","object":"text_completion","usage":{"completion_tokens":16,"prompt_tokens":4,"prompt_tokens_details":null,"total_tokens":20}}
     ```

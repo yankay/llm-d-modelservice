@@ -63,7 +63,4 @@ endpointPicker:
   debugLevel: 6
   disableReadinessProbe: true 
   disableLivenessProbe: true
-  
-  autoscaling:
-    enabled: false
   replicas: 1

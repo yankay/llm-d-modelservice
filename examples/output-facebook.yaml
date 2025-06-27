@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: facebook-sim-test-llm-d-modelservice-epp-sa
+  name: facebook-llm-d-modelservice-epp-sa
   labels:
     helm.sh/chart: llm-d-modelservice-0.0.1
     app.kubernetes.io/version: "0.0.1"
@@ -13,17 +13,30 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: facebook-sim-test-llm-d-modelservice-sa
+  name: facebook-llm-d-modelservice-sa
   labels:
     helm.sh/chart: llm-d-modelservice-0.0.1
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 ---
+# Source: llm-d-modelservice/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: facebook-llm-d-modelservice-epp-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pod-read
+subjects:
+- kind: ServiceAccount
+  name: facebook-llm-d-modelservice-epp-sa
+---
 # Source: llm-d-modelservice/templates/epp-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: facebook-sim-test-llm-d-modelservice-epp-service
+  name: facebook-llm-d-modelservice-epp-service
   labels:
     helm.sh/chart: llm-d-modelservice-0.0.1
     app.kubernetes.io/version: "0.0.1"
@@ -36,15 +49,13 @@ spec:
       protocol: TCP
       appProtocol: http2
   selector:
-    app.kubernetes.io/name: llm-d-modelservice
-    app.kubernetes.io/instance: facebook-sim-test
-    llm-d.ai/epp: facebook-sim-test-llm-d-modelservice-epp
+    llm-d.ai/epp: facebook-llm-d-modelservice-epp
 ---
 # Source: llm-d-modelservice/templates/decode-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: facebook-sim-test-llm-d-modelservice-decode
+  name: facebook-llm-d-modelservice-decode
   labels:
     helm.sh/chart: llm-d-modelservice-0.0.1
     app.kubernetes.io/version: "0.0.1"
@@ -54,13 +65,13 @@ spec:
   selector:
     matchLabels:
       llm-d.ai/inferenceServing: "true"
-      llm-d.ai/model: facebook-sim-test
+      llm-d.ai/model: facebook-llm-d-modelservice
       llm-d.ai/role: decode
   template:
     metadata:
       labels:
         llm-d.ai/inferenceServing: "true"
-        llm-d.ai/model: facebook-sim-test
+        llm-d.ai/model: facebook-llm-d-modelservice
         llm-d.ai/role: decode
     spec:
       initContainers:
@@ -80,7 +91,11 @@ spec:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
     
-      serviceAccountName: facebook-sim-test-llm-d-modelservice-sa
+      serviceAccountName: facebook-llm-d-modelservice-sa
+      volumes:
+        - name: model-storage
+          emptyDir: 
+            sizeLimit: 20Gi
       containers:
         - name: vllm
           image: ghcr.io/llm-d/llm-d:0.0.8
@@ -88,7 +103,7 @@ spec:
           - vllm
           - serve
           args:
-          - facebook/opt-125m
+          - "facebook/opt-125m"
           - --port
           - "8200"
           - --enforce-eager
@@ -109,6 +124,12 @@ spec:
             value: "5557"
           - name: VLLM_LOGGING_LEVEL
             value: DEBUG
+          - name: DP_SIZE
+            value: "1"
+          - name: TP_SIZE
+            value: "1"
+          - name: DP_SIZE_LOCAL
+            value: "1"
           - name: HF_HOME
             value: /model-cache
           
@@ -124,28 +145,24 @@ spec:
           volumeMounts:
           - name: model-storage
             mountPath: /model-cache
-      volumes:
-        - name: model-storage
-          emptyDir: 
-            sizeLimit: 5Mi
 ---
 # Source: llm-d-modelservice/templates/epp-deployment.yaml
 apiVersion: apps/v1 
 kind: Deployment 
 metadata: 
-  name: facebook-sim-test-llm-d-modelservice-epp
+  name: facebook-llm-d-modelservice-epp
   labels: 
-    llm-d.ai/epp: facebook-sim-test-llm-d-modelservice-epp
-  namespace: default
+    llm-d.ai/epp: facebook-llm-d-modelservice-epp
+  namespace: e2e-solution
 spec:
   replicas: 1
   selector:
     matchLabels:
-      llm-d.ai/epp: facebook-sim-test-llm-d-modelservice-epp
+      llm-d.ai/epp: facebook-llm-d-modelservice-epp
   template:
     metadata:
       labels:
-        llm-d.ai/epp: facebook-sim-test-llm-d-modelservice-epp
+        llm-d.ai/epp: facebook-llm-d-modelservice-epp
     spec:
       containers:
       - name: epp 
@@ -153,9 +170,9 @@ spec:
         image: ghcr.io/llm-d/llm-d-inference-scheduler:0.0.3
         args:
         - --poolName
-        - facebook-sim-test-llm-d-modelservice-inference-pool
+        - facebook-llm-d-modelservice-inference-pool
         - --poolNamespace
-        - default
+        - e2e-solution
         - -v
         - "4"
         - --zap-encoder
@@ -164,6 +181,7 @@ spec:
         - "9002"
         - --grpcHealthPort
         - "9003"
+        # using defaults from https://github.com/llm-d/llm-d-deployer/blob/main/charts/llm-d/values.yaml#L563-L603
         env:
         - name: ENABLE_KVCACHE_AWARE_SCORER
           value: "false"
@@ -213,32 +231,32 @@ spec:
         - containerPort: 9090
           name: metrics
           protocol: TCP
-      serviceAccount: facebook-sim-test-llm-d-modelservice-epp-sa
-      serviceAccountName: facebook-sim-test-llm-d-modelservice-epp-sa
-      readinessProbe:
-        grpc:
-          port: 9003
-          service: envoy.service.ext_proc.v3.ExternalProcessor
-        initialDelaySeconds: 5
-        timeoutSeconds: 1
-        periodSeconds: 10
-        successThreshold: 1
-        failureThreshold: 3
-      livenessProbe:
-        grpc:
-          port: 9003
-          service: envoy.service.ext_proc.v3.ExternalProcessor
-        initialDelaySeconds: 5
-        timeoutSeconds: 1
-        periodSeconds: 10
-        successThreshold: 1
-        failureThreshold: 3
+        readinessProbe:
+          grpc:
+            port: 9003
+            service: envoy.service.ext_proc.v3.ExternalProcessor
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          grpc:
+            port: 9003
+            service: envoy.service.ext_proc.v3.ExternalProcessor
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+      serviceAccount: facebook-llm-d-modelservice-epp-sa
+      serviceAccountName: facebook-llm-d-modelservice-epp-sa
 ---
 # Source: llm-d-modelservice/templates/prefill-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: facebook-sim-test-llm-d-modelservice-prefill
+  name: facebook-llm-d-modelservice-prefill
   labels:
     helm.sh/chart: llm-d-modelservice-0.0.1
     app.kubernetes.io/version: "0.0.1"
@@ -248,17 +266,21 @@ spec:
   selector:
     matchLabels:
       llm-d.ai/inferenceServing: "true"
-      llm-d.ai/model: facebook-sim-test
+      llm-d.ai/model: facebook-llm-d-modelservice
       llm-d.ai/role: prefill
   template:
     metadata:
       labels:
         llm-d.ai/inferenceServing: "true"
-        llm-d.ai/model: facebook-sim-test
+        llm-d.ai/model: facebook-llm-d-modelservice
         llm-d.ai/role: prefill
     spec:
     
-      serviceAccountName: facebook-sim-test-llm-d-modelservice-sa
+      serviceAccountName: facebook-llm-d-modelservice-sa
+      volumes:
+        - name: model-storage
+          emptyDir: 
+            sizeLimit: 20Gi
       containers:
         - name: vllm
           image: ghcr.io/llm-d/llm-d:0.0.8
@@ -266,7 +288,7 @@ spec:
           - vllm
           - serve
           args:
-          - facebook/opt-125m
+          - "facebook/opt-125m"
           - --port
           - "8000"
           - --enforce-eager
@@ -285,6 +307,12 @@ spec:
                 fieldPath: status.podIP
           - name: VLLM_LOGGING_LEVEL
             value: DEBUG
+          - name: DP_SIZE
+            value: "1"
+          - name: TP_SIZE
+            value: "1"
+          - name: DP_SIZE_LOCAL
+            value: "1"
           
           resources:
             limits:
@@ -295,71 +323,65 @@ spec:
               cpu: "16"
               memory: 16Gi
               nvidia.com/gpu: "1"
-      volumes:
-        - name: model-storage
-          emptyDir: 
-            sizeLimit: 5Mi
 ---
 # Source: llm-d-modelservice/templates/routing.yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: facebook-sim-test-llm-d-modelservice-http-route
-  namespace: default
+  name: facebook-llm-d-modelservice-http-route
+  namespace: e2e-solution
   labels:
     helm.sh/chart: llm-d-modelservice-0.0.1
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 spec:
   parentRefs:
-  - group: gateway.networking.k8s.io
-    kind: Gateway
-    name: inference-gateway
+  - name: inference-gateway
   rules:
   - backendRefs:
     - group: inference.networking.x-k8s.io
       kind: InferencePool
-      name: facebook-sim-test-llm-d-modelservice-inference-pool
+      name: facebook-llm-d-modelservice-inference-pool
       port: 8000
       weight: 1
     matches:
-    - headers:
+    - path:
+        type: PathPrefix
+        value: /
+      headers:
       - name: x-model-name
         type: Exact
         value: facebook/opt-125m
-      path:
-        type: PathPrefix
-        value: /
 ---
 # Source: llm-d-modelservice/templates/routing.yaml
 apiVersion: inference.networking.x-k8s.io/v1alpha2
 kind: InferenceModel
 metadata:
-  name: facebook-sim-test-llm-d-modelservice-inference-model
-  namespace: default
+  name: facebook-llm-d-modelservice-inference-model
+  namespace: e2e-solution
   labels:
     llm-d.ai/inferenceServing: "true"
-    llm-d.ai/model: facebook-sim-test
+    llm-d.ai/model: facebook-llm-d-modelservice
 spec:
   modelName: facebook/opt-125m
   poolRef:
     group: inference.networking.x-k8s.io
     kind: InferencePool
-    name: facebook-sim-test-llm-d-modelservice-inference-pool
+    name: facebook-llm-d-modelservice-inference-pool
 ---
 # Source: llm-d-modelservice/templates/routing.yaml
 apiVersion: inference.networking.x-k8s.io/v1alpha2
 kind: InferencePool
 metadata:
-  name: facebook-sim-test-llm-d-modelservice-inference-pool
-  namespace: default
+  name: facebook-llm-d-modelservice-inference-pool
+  namespace: e2e-solution
 spec:
   extensionRef:
     failureMode: FailClose
     group: ""
     kind: Service
-    name: facebook-sim-test-llm-d-modelservice-epp-service
+    name: facebook-llm-d-modelservice-epp-service
   selector:
     llm-d.ai/inferenceServing: "true"
-    llm-d.ai/model: facebook-sim-test
+    llm-d.ai/model: facebook-llm-d-modelservice
   targetPortNumber: 8000

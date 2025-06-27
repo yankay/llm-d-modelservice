@@ -16,7 +16,9 @@ routing:
   - name: inference-gateway
 
 modelArtifacts:
+# This is the model name used to start vLLM.
   uri: "hf://facebook/opt-125m"
+  size: 20Gi
 
 # describe decode pods
 decode:
@@ -110,7 +112,4 @@ endpointPicker:
     appProtocol: http2
   # The name of cluster role containing permissions to be granted to endpointPicker (via a role binding to the service account)
   permissions: pod-read
-  
-  autoscaling:
-    enabled: false
   replicas: 1
