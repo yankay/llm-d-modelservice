@@ -3,7 +3,7 @@
 This folder contains example values file and their rendered templates.
 
 ```
-helm template [RELEASE-NAME] . -f [VALUES-FILEPATH]
+helm install [RELEASE-NAME] llm-d-modelservice -f [VALUES-FILEPATH]
 ```
 
 1. `vllm-sim` in Kind 
@@ -13,13 +13,13 @@ helm template [RELEASE-NAME] . -f [VALUES-FILEPATH]
     Dry run:
     
     ```
-    helm template llmd-sim . -f examples/values-vllm-sim.yaml > examples/output-vllm-sim.yaml
+    helm template vllm-sim llm-d-modelservice -f llm-d-modelservice/examples/values-vllm-sim.yaml > llm-d-modelservice/examples/output-vllm-sim.yaml
     ```
     
     Install in a Kind cluster:
     
     ```
-    helm install llmd-sim . -f examples/values-vllm-sim.yaml
+    helm install vllm-sim llm-d-modelservice -f llm-d-modelservice/examples/values-vllm-sim.yaml
     ```
     
     Port forward the inference gateway service. 
@@ -47,19 +47,19 @@ helm template [RELEASE-NAME] . -f [VALUES-FILEPATH]
     ```
 
 
-2. `facebook/opt-125m`: downloads a model from Hugging Face 
+2. `facebook/opt-125m`: downloads a model from Hugging Face. Ensure that the name of the Gateway is correct in the values file.
 
     Dry-run:
     
     ```
-    helm template facebook . -f examples/values-facebook.yaml > examples/output-facebook.yaml
+    helm template facebook llm-d-modelservice -f llm-d-modelservice/examples/values-facebook.yaml > llm-d-modelservice/examples/output-facebook.yaml
     ```
     
     or install in a cluster 
     
     
     ```
-    helm install facebook . -f examples/values-facebook.yaml
+    helm install facebook llm-d-modelservice -f llm-d-modelservice/examples/values-facebook.yaml
     ```
     
     
