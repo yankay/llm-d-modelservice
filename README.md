@@ -6,7 +6,7 @@ Helm chart for ModelService.
 Add this repository to Helm.
 
 ```
-helm repo add llm-d-modelservice https://github.com/llm-d-incubation/llm-d-modelservice
+helm repo add llm-d-modelservice https://llm-d-incubation.github.io/llm-d-modelservice/
 helm repo update
 ```
 
