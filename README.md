@@ -2,4 +2,11 @@
 
 Helm chart for ModelService
 
-See [examples](./examples) for hwo to use this Helm chart. 
+Add this repository to Helm.
+
+```
+helm repo add llm-d-modelservice https://github.com/llm-d-incubation/llm-d-modelservice.git
+helm repo update
+```
+
+See [examples](./llm-d-modelservice/examples) for hwo to use this Helm chart. 
