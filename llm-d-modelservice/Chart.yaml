@@ -1,6 +1,6 @@
 apiVersion: v2
 name: llm-d-modelservice
-description: A Helm chart for ModelService
+description: A Helm chart for ModelService in llm-d
 
 # A chart can be either an 'application' or a 'library' chart.
 #
