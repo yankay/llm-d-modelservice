@@ -17,6 +17,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
+        # Checks out the main branch 
+        ref: main
         fetch-depth: 0
 
     - name: Configure Git
