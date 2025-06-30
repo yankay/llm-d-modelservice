@@ -8,7 +8,8 @@ helm install [RELEASE-NAME] llm-d-modelservice/llm-d-modelservice -f [VALUES-FIL
 
 1. `vllm-sim` in Kind 
 
-    Make sure there is a gateway (Kgteway or Istio) deployed in the cluster named `llm-d-inference-gateway` or change values file accordingly. Follow [these instructions](https://gateway-api-inference-extension.sigs.k8s.io/guides/#__tabbed_3_2) on how to set up a gateway. Once done, update `routing.parentRefs[*].name` in the values file to use the name for the Gateway in the cluster.
+    Make sure there is a gateway (Kgteway or Istio) deployed in the cluster. Follow [these instructions](https://gateway-api-inference-extension.sigs.k8s.io/guides/#__tabbed_3_2) on how to set up a gateway. Once done, update `routing.parentRefs[*].name` in this [values file](values-vllm-sim.yaml#L18) to use the name for the Gateway (`llm-d-inference-gateway-istio`) in the cluster.
+    
     
     Dry run:
     
@@ -47,7 +48,7 @@ helm install [RELEASE-NAME] llm-d-modelservice/llm-d-modelservice -f [VALUES-FIL
     ```
 
 
-2. `facebook/opt-125m`: downloads a model from Hugging Face. Ensure that the name of the Gateway is correct in the values file.
+2. `facebook/opt-125m`: downloads a model from Hugging Face. Ensure that the name of the Gateway is correct in [this](values-facebook.yaml#L16) values file.
 
     Dry-run:
     
