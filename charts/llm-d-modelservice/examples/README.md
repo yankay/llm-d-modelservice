@@ -3,6 +3,7 @@
 This folder contains example values file and their rendered templates.
 
 ```
+cd charts
 helm install [RELEASE-NAME] llm-d-modelservice/llm-d-modelservice -f [VALUES-FILEPATH]
 ```
 

@@ -10,9 +10,9 @@ helm repo add llm-d-modelservice https://llm-d-incubation.github.io/llm-d-models
 helm repo update
 ```
 
-See [examples](https://llm-d-incubation.github.io/llm-d-modelservice/charts/llm-d-modelservice/examples) for how to use this Helm chart. 
+See [examples](https://llm-d-incubation.github.io/llm-d-modelservice/charts/llm-d-modelservice/examples) for how to use this Helm chart.
 
-## Values 
+## Values
 Below are the values you can set.
 | Key                                    | Description                                                                                                       | Type         | Default                                     |
 |----------------------------------------|-------------------------------------------------------------------------------------------------------------------|--------------|---------------------------------------------|
@@ -36,6 +36,7 @@ Below are the values you can set.
 | `decode.containers[*].command`         | List of commands for the decode container.                                                                        | List[string] | []                                          |
 | `decode.containers[*].ports`           | List of ports for the decode container.                                                                           | List[Port]   | []                                          |
 | `prefill`                              | Same fields supported in `decode`                                                                                 | See above    | See above                                   |
+| `endpointPicker.service.permissions`          | Role created for the Inference Scheduler                                  | string       | N/A                                   |
 | `endpointPicker.service.type`          | Type of Service created for the Inference Scheduler (Endpoint Picker) deployment                                  | string       | ClusterIP                                   |
 | `endpointPicker.service.port`          | The port the Inference Scheduler listens on                                                                       | int          | 9002                                        |
 | `endpointPicker.service.targetPort`    | The target port the Inference Scheduler listens on                                                                | int          | 9002                                        |

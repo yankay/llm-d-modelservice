@@ -66,3 +66,4 @@ endpointPicker:
   disableReadinessProbe: true
   disableLivenessProbe: true
   replicas: 1
+  permissions: pod-read
