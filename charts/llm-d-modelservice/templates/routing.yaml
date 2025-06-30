@@ -18,7 +18,7 @@ spec:
     {{- include "llm-d-modelservice.pdlabels" . | nindent 4 }}
   targetPortNumber: {{ .Values.routing.servicePort }}
 {{- end }}
---- 
+---
 {{- if .Values.inferenceModel }}
 apiVersion: inference.networking.x-k8s.io/v1alpha2
 kind: InferenceModel
@@ -34,7 +34,7 @@ spec:
     kind: InferencePool
     name: {{ include "llm-d-modelservice.fullname" . }}-inference-pool
 {{- end }}
---- 
+---
 {{- if .Values.httpRoute }}
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute

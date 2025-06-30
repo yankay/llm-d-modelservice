@@ -22,3 +22,11 @@ version: 0.0.5
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "0.0.1"
+
+maintainers:
+  - name: "Jing Chen"
+    email: "jing.chen2@ibm.com"
+    url: "https://github.com/jgchn"
+  - name: "Michael Kalantar"
+    email: "kalantar@us.ibm.com"
+    url: "https://github.com/kalantar"

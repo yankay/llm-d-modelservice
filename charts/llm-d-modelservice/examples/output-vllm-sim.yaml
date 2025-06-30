@@ -5,7 +5,7 @@ kind: ServiceAccount
 metadata:
   name: vllm-sim-llm-d-modelservice-epp-sa
   labels:
-    helm.sh/chart: llm-d-modelservice-0.0.2
+    helm.sh/chart: llm-d-modelservice-0.0.4
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 ---
@@ -15,7 +15,7 @@ kind: ServiceAccount
 metadata:
   name: vllm-sim-llm-d-modelservice-sa
   labels:
-    helm.sh/chart: llm-d-modelservice-0.0.2
+    helm.sh/chart: llm-d-modelservice-0.0.4
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 ---
@@ -38,7 +38,7 @@ kind: Service
 metadata:
   name: vllm-sim-llm-d-modelservice-epp-service
   labels:
-    helm.sh/chart: llm-d-modelservice-0.0.2
+    helm.sh/chart: llm-d-modelservice-0.0.4
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -57,7 +57,7 @@ kind: Deployment
 metadata:
   name: vllm-sim-llm-d-modelservice-decode
   labels:
-    helm.sh/chart: llm-d-modelservice-0.0.2
+    helm.sh/chart: llm-d-modelservice-0.0.4
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -220,7 +220,7 @@ kind: Deployment
 metadata:
   name: vllm-sim-llm-d-modelservice-prefill
   labels:
-    helm.sh/chart: llm-d-modelservice-0.0.2
+    helm.sh/chart: llm-d-modelservice-0.0.4
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -280,7 +280,7 @@ metadata:
   name: vllm-sim-llm-d-modelservice-http-route
   namespace: default
   labels:
-    helm.sh/chart: llm-d-modelservice-0.0.2
+    helm.sh/chart: llm-d-modelservice-0.0.4
     app.kubernetes.io/version: "0.0.1"
     app.kubernetes.io/managed-by: Helm
 spec:
