@@ -1,11 +1,12 @@
 name: Helm Chart Release
 
-# Only runs when a release is created on GitHub
-
 on:
   push:
     branches:
       - main
+    paths:
+      - charts/**
+      
     
   workflow_dispatch:
 
