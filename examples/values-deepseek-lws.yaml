@@ -2,6 +2,7 @@
 
 # If true, use a LeaderWorkerSet instead of a Deployment to host the model
 multinode: true
+scriptedStart: true
 inferencePool: true
 httpRoute: true
 
