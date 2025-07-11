@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "llm-d-modelservice.fullname" . }}-epp-service
+  name: {{ include "llm-d-modelservice.eppServiceName" . }}
   labels:
     {{- include "llm-d-modelservice.labels" . | nindent 4 }}
 spec:
@@ -13,5 +13,5 @@ spec:
       protocol: TCP
       appProtocol: {{ .Values.routing.epp.service.appProtocol }}
   selector:
-    llm-d.ai/epp: {{ include "llm-d-modelservice.fullname" . }}-epp
+    llm-d.ai/epp: {{ include "llm-d-modelservice.eppName" . }}
 {{- end }}
