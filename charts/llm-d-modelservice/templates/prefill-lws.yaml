@@ -6,12 +6,21 @@ metadata:
   labels:
     {{- include "llm-d-modelservice.labels" . | nindent 4 }}
     {{- include "llm-d-modelservice.prefilllabels" . | nindent 4 }}
+  annotations:
+    leaderworkerset.sigs.k8s.io/subgroup-exclusive-topology: kubernetes.io/hostname
 spec:
   {{- if not .Values.prefill.autoscaling.enabled }}
   replicas: {{ default 1 .Values.prefill.replicas }}
   {{- end }}
   leaderWorkerTemplate:
-    size: {{ div (int (include "llm-d-modelservice.dataParallelism" .Values.prefill.parallelism)) (int (include "llm-d-modelservice.dataLocalParallelism" .Values.prefill.parallelism)) }}
+    size: {{ int (include "llm-d-modelservice.dataParallelism" .Values.prefill.parallelism) }}
+    {{- if .Values.prefill.subGroupPolicy }}
+    subGroupPolicy:
+    {{- toYaml .Values.prefill.subGroupPolicy | nindent 6 }}
+    {{- else }}
+    subGroupPolicy:
+      subGroupSize: 8
+    {{-  end }}
 
     # no sidecar so no need to specify leader separately
 
@@ -20,6 +29,8 @@ spec:
         labels:
           {{- include "llm-d-modelservice.prefilllabels" . | nindent 10 }}
       spec:
+        hostIPC: true
+        hostPID: true
         {{- (include "llm-d-modelservice.modelPod" (merge . (dict "pdSpec" .Values.prefill))) | nindent 6 }}
         {{- with .Values.prefill.containers }}
         containers:
