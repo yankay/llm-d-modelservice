@@ -15,7 +15,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: "v0.2.1"
+version: "v0.2.2"
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -30,3 +30,13 @@ maintainers:
   - name: "Michael Kalantar"
     email: "kalantar@us.ibm.com"
     url: "https://github.com/kalantar"
+
+sources:
+  - https://github.com/llm-d-incubation/llm-d-modelservice
+
+dependencies:
+  - name: common
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami-common
+    version: "2.27.0"

@@ -263,17 +263,17 @@ VolumeMount for a PD container
 Supplies model-storage mount if mountModelVolume: true for the container
 */}}
 {{- define "llm-d-modelservice.mountModelVolumeVolumeMounts" -}}
-{{- if or .volumeMounts .mountModelVolume }}
+{{- if or .container.volumeMounts .container.mountModelVolume }}
 volumeMounts:
 {{- end }}
 {{- /* user supplied volume mount in values */}}
-{{- with .volumeMounts }}
+{{- with .container.volumeMounts }}
   {{- toYaml . | nindent 2 }}
 {{- end }}
 {{- /* what we add if mounModelVolume is true */}}
-{{- if .mountModelVolume }}
+{{- if .container.mountModelVolume }}
   - name: model-storage
-    mountPath: /model-cache
+    mountPath: {{ .Values.modelArtifacts.mountPath }}
 {{- end }}
 {{- end }}
 
@@ -336,7 +336,7 @@ context is a dict with helm root context plus:
   {{- (include "llm-d-modelservice.hfEnv" .) | nindent 2 }}
   {{- with .container.ports }}
   ports:
-    {{- toYaml . | nindent 2 }}
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 2 }}
   {{- end }}
   {{- with .container.livenessProbe }}
   livenessProbe:
@@ -351,7 +351,7 @@ context is a dict with helm root context plus:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- (include "llm-d-modelservice.resources" (dict "resources" .container.resources "parallelism" .parallelism)) | nindent 2 }}
-  {{- include "llm-d-modelservice.mountModelVolumeVolumeMounts" .container | nindent 2 }}
+  {{- include "llm-d-modelservice.mountModelVolumeVolumeMounts" (dict "container" .container "Values" .Values) | nindent 2 }}
   {{- with .container.workingDir }}
   workingDir: {{ . }}
   {{- end }}
@@ -372,7 +372,7 @@ context is a dict with helm root context plus:
   {{- if .modelArg }}
   - --model
   {{- end }}
-  - {{ $other | quote }}
+  - {{ include "common.tplvalues.render" ( dict "value" $other "context" $ ) }}
 {{- else if eq $protocol "pvc" }}
 {{- /* $other is the PVC claim and the path to the model */}}
 {{- $claimpath := regexSplit "/" $other 2 -}}
@@ -380,7 +380,7 @@ context is a dict with helm root context plus:
   {{- if .modelArg }}
   - --model
   {{- end }}
-  - /model-cache/{{ $path }}
+  - {{ .Values.modelArtifacts.mountPath }}/{{ $path }}
 {{- else if eq $protocol "pvc+hf" }}
 {{- $claimpath := regexSplit "/" $other -1 -}}
 {{- $length := len $claimpath }}
@@ -409,7 +409,7 @@ args:
   - "$TP_SIZE"
   {{- end }}
   - --served-model-name
-  - {{ .Values.routing.modelName }}
+  - {{ .Values.modelArtifacts.name | quote }}
 {{- with .container.args }}
   {{ toYaml . | nindent 2 }}
 {{- end }}
@@ -427,7 +427,7 @@ args:
   - "$TP_SIZE"
   {{- end }}
   - --served-model-name
-  - {{ .Values.routing.modelName }}
+  - {{ .Values.modelArtifacts.name | quote }}
 {{- with .container.args }}
   {{ toYaml . | nindent 2 }}
 {{- end }}
@@ -477,7 +477,7 @@ context is a dict with helm root context plus:
 {{- if eq $protocol "hf" }}
 {{- if .container.mountModelVolume }}
 - name: HF_HOME
-  value: /model-cache
+  value: {{ .Values.modelArtifacts.mountPath }}
 {{- end }}
 {{- end }}
 {{- if eq $protocol "pvc+hf" }}

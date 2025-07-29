@@ -186,6 +186,11 @@ spec:
               secretKeyRef:
                 name: llm-d-hf-token
                 key: HF_TOKEN
+          ports:
+          - containerPort: 8200
+            protocol: TCP
+          - containerPort: 5557
+            protocol: TCP
           
           resources:
             limits:
@@ -353,6 +358,11 @@ spec:
               secretKeyRef:
                 name: llm-d-hf-token
                 key: HF_TOKEN
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          - containerPort: 5557
+            protocol: TCP
           
           resources:
             limits:
@@ -386,6 +396,7 @@ spec:
   - group: gateway.networking.k8s.io
     kind: Gateway
     name: infra-wide-pd-inference-gateway
+    namespace: 'default'
   rules:
     - timeouts:
         backendRequest: "0s"

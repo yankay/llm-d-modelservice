@@ -6,19 +6,20 @@ multinode: true
 
 modelArtifacts:
 # This is the model name used to start vLLM.
-  uri: "hf://Qwen/Qwen3-30B-A3B-FP8"
+  name: Qwen/Qwen3-30B-A3B-FP8
+  uri: hf://"{{ .Values.modelArtifacts.name }}"
   size: 100Gi
   authSecretName: "llm-d-hf-token"
 
 # Describe routing requirements. In addition to service level routing (OpenAI model name, service port)
 # also describes elements for Gateway API Inference Extension configuration
 routing:
-  modelName: Qwen/Qwen3-30B-A3B-FP8
   servicePort: 8000
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: infra-wide-pd-inference-gateway
+      namespace: "{{ .Release.Namespace }}"
 
   # required for certain gateways (e.g. Kgateway) but not others (Istio)
   # creating this so that it works for all gateways
@@ -147,6 +148,11 @@ decode:
           add:
           - "IPC_LOCK"
           - "SYS_RAWIO"
+      ports:
+      - containerPort: 8200  # from routing.proxy.targetPort
+        protocol: TCP
+      - containerPort: 5557  # NIXL side channel
+        protocol: TCP
       resources:
         limits:
           memory: 128Gi
@@ -272,6 +278,11 @@ prefill:
           add:
           - "IPC_LOCK"
           - "SYS_RAWIO"
+      ports:
+      - containerPort: 8000  # from routing.servicePort
+        protocol: TCP
+      - containerPort: 5557  # NIXL side channel
+        protocol: TCP
       resources:
         limits:
           memory: 128Gi
