@@ -282,18 +282,24 @@ Pod elements of deployment/lws spec template
 context is a pdSpec
 */}}
 {{- define "llm-d-modelservice.modelPod" -}}
+  {{- with .pdSpec.extraConfig }}
+    {{ include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 2 }}
+  {{- end }}
+  {{- /* DEPRECATED; use extraConfig.imagePullSecrets instead */ -}}
   {{- with .pdSpec.imagePullSecrets }}
   imagePullSecrets:
     {{- toYaml . | nindent 2 }}
   {{- end }}
-  serviceAccountName: {{ include "llm-d-modelservice.pdServiceAccountName" . }}
+  {{- /* DEPRECATED; use extraConfig.scheulerName instead */ -}}
   {{- if or .pdSpec.schedulerName .Values.schedulerName }}
   schedulerName: {{ .pdSpec.schedulerName | default .Values.schedulerName }}
   {{- end }}
+  {{- /* DEPRECATED; use extraConfig.securityContext instead */ -}}
   {{- with .pdSpec.podSecurityContext }}
   securityContext:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  serviceAccountName: {{ include "llm-d-modelservice.pdServiceAccountName" . }}
   {{- with .pdSpec.acceleratorTypes }}
   {{- include "llm-d-modelservice.acceleratorTypes" . | nindent 2 }}
   {{- end -}}
@@ -315,21 +321,24 @@ context is a dict with helm root context plus:
 {{- define "llm-d-modelservice.container" -}}
 - name: {{ default "vllm" .container.name }}
   image: {{ required "image of container is required" .container.image }}
+  {{- with .container.extraConfig }}
+    {{ include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 2 }}
+  {{- end }}
+  {{- /* DEPRECATED; use extraConfig.securityContext instead */ -}}
   {{- with .container.securityContext }}
   securityContext:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- /* DEPRECATED; use extraConfig.imagePullPolicy instead */ -}}
   {{- with .container.imagePullPolicy }}
   imagePullPolicy: {{ . }}
   {{- end }}
   {{- /* handle command and args */}}
   {{- include "llm-d-modelservice.command" . | nindent 2 }}
   {{- /* insert user's env for this container */}}
-  {{- if or .container.env .container.mountModelVolume }}
   env:
-  {{- end }}
   {{- with .container.env }}
-    {{- toYaml . | nindent 2 }}
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 2 }}
   {{- end }}
   {{- (include "llm-d-modelservice.parallelismEnv" .) | nindent 2 }}
   {{- /* insert envs based on what modelArtifact prefix */}}
@@ -338,26 +347,32 @@ context is a dict with helm root context plus:
   ports:
     {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 2 }}
   {{- end }}
+  {{- /* DEPRECATED; use extraConfig.livenessProbe instead */ -}}
   {{- with .container.livenessProbe }}
   livenessProbe:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- /* DEPRECATED; use extraConfig.readinessProbe instead */ -}}
   {{- with .container.readinessProbe }}
   readinessProbe:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- /* DEPRECATED; use extraConfig.startupProbe instead */ -}}
   {{- with .container.startupProbe }}
   startupProbe:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- (include "llm-d-modelservice.resources" (dict "resources" .container.resources "parallelism" .parallelism)) | nindent 2 }}
   {{- include "llm-d-modelservice.mountModelVolumeVolumeMounts" (dict "container" .container "Values" .Values) | nindent 2 }}
+  {{- /* DEPRECATED; use extraConfig.workingDir instead */ -}}
   {{- with .container.workingDir }}
   workingDir: {{ . }}
   {{- end }}
+  {{- /* DEPRECATED; use extraConfig.stdin instead */ -}}
   {{- with .container.stdin }}
   stdin: {{ . }}
   {{- end }}
+  {{- /* DEPRECATED; use extraConfig.tty instead */ -}}
   {{- with .container.tty }}
   tty: {{ . }}
   {{- end }}
