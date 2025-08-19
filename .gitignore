@@ -1,0 +1,21 @@
+# Binaries for programs and plugins
+bin
+
+# Chart dependencies
+charts/**/*.tgz
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Various IDEs
+.idea
+.vscode
+
+# Common backup files
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
