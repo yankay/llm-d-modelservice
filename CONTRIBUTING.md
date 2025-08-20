@@ -21,16 +21,27 @@ This project adheres to the llm-d [Code of Conduct](https://github.com/llm-d/llm
 
 We welcome contributions to the llm-d-modelservice chart! If you have a bug fix, feature request, or improvement, please submit a pull request (PR) to the repository.
 
-Before submitting a pull request, please ensure that you have the following dependencies installed and set up:
+Before submitting a pull request, please make sure you have the following tools installed:
 
 - [Helm](https://helm.sh/)
-<!-- TODO after the pre-commit supported 
-- [Helm docs](https://github.com/norwoodj/helm-docs) 
+- [Chart Testing](https://github.com/helm/chart-testing)
+<!-- TODO: Once supported, also install:
+- [Helm docs](https://github.com/norwoodj/helm-docs)
 - [pre-commit](https://pre-commit.com/) -->
+
+You can install these tools by:
+
+```bash
+# Install tools locall in PROJECT_DIR/bin directory
+make tools
+# Export PATH to use the locally installed tools directly
+export PATH="$(pwd)/bin:$PATH"
+```
 
 Then run:
 
 ```bash
+# After exporting PATH, you can use the tools directly
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm dependency update charts/llm-d-modelservice/
 helm dependency build charts/llm-d-modelservice/
