@@ -98,7 +98,9 @@ Below are the values you can set.
 
 ## Contribute
 
-We welcome contributions in the form of a GitHub issue or pull request. Please open a ticket if you see a gap in your use case as we continue to evolve this project.
+We welcome contributions to llm-d-modelservice! Please see our [Contributing Guide](CONTRIBUTING.md) for detailed information on how to contribute to this project, including guidelines for submitting issues, pull requests, and development setup.
+
+Please open a ticket if you see a gap in your use case as we continue to evolve this project.
 
 ## Contact
 Get involved or ask questions in the `#sig-model-service` channel in the `llm-d` Slack workspace! Details on how to join the workspace can be found [here](https://github.com/llm-d/llm-d?tab=readme-ov-file#contribute).
